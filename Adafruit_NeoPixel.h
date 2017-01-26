@@ -20,20 +20,20 @@
 #define ADAFRUIT_NEOPIXEL_H
 
 
-#if !defined(__cplusplus)
-  #ifndef boolean
-    #define boolean uint8_t
-  #endif
-#endif
-
-#if defined(ARDUINO)
+#if defined(__cplusplus)
   #if (ARDUINO >= 100)
     #include <Arduino.h>
   #else
     #include <WProgram.h>
     #include <pins_arduino.h>
   #endif
-#elif defined(MG_VERSION)
+#else
+  #include <stdlib.h>
+  #include <inttypes.h>
+  #include <stdbool.h>
+  // #include <stdio.h>
+  // #include "common/platform.h"
+  // #include "common/cs_file.h"
   #include "fw/src/mgos_gpio.h"
 #endif
 
@@ -223,7 +223,7 @@ typedef struct {
 // Constructor: number of LEDs, pin number, LED type
 void
   Adafruit_NeoPixel____init___n_p_t(Adafruit_NeoPixel *this, uint16_t n, uint8_t p, neoPixelType t);
-  // Adafruit_NeoPixel__constructor_n_p_t(Adafruit_NeoPixel *this, uint16_t n, uint8_t p=6, neoPixelType t=NEO_GRB + NEO_KHZ800);
+  // Adafruit_NeoPixel____init___n_p_t(Adafruit_NeoPixel *this, uint16_t n, uint8_t p=6, neoPixelType t=NEO_GRB + NEO_KHZ800);
 void
   Adafruit_NeoPixel____init__(Adafruit_NeoPixel *this);
 void

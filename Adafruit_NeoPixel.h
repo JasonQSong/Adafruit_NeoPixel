@@ -19,11 +19,22 @@
 #ifndef ADAFRUIT_NEOPIXEL_H
 #define ADAFRUIT_NEOPIXEL_H
 
-#if (ARDUINO >= 100)
- #include <Arduino.h>
-#else
- #include <WProgram.h>
- #include <pins_arduino.h>
+
+#if !defined(__cplusplus)
+  #ifndef boolean
+    #define boolean uint8_t
+  #endif
+#endif
+
+#if defined(ARDUINO)
+  #if (ARDUINO >= 100)
+    #include <Arduino.h>
+  #else
+    #include <WProgram.h>
+    #include <pins_arduino.h>
+  #endif
+#elif defined(MG_VERSION)
+  #include "fw/src/mgos_gpio.h"
 #endif
 
 // The order of primary colors in the NeoPixel data stream can vary
@@ -113,6 +124,7 @@ typedef uint16_t neoPixelType;
 typedef uint8_t  neoPixelType;
 #endif
 
+#if defined(__cplusplus)
 class Adafruit_NeoPixel {
 
  public:
@@ -177,5 +189,86 @@ class Adafruit_NeoPixel {
 #endif
 
 };
+
+#else // if defined(__cplusplus)
+
+typedef struct {
+  bool
+#ifdef NEO_KHZ400  // If 400 KHz NeoPixel support enabled...
+    is800KHz,      // ...true if 800 KHz pixels
+#endif
+    begun;         // true if begin() previously called
+  uint16_t
+    numLEDs,       // Number of RGB LEDs in strip
+    numBytes;      // Size of 'pixels' buffer below (3 or 4 bytes/pixel)
+  int8_t
+    pin;           // Output pin number (-1 if not yet set)
+  uint8_t
+    brightness,
+   *pixels,        // Holds LED color values (3 or 4 bytes each)
+    rOffset,       // Index of red byte within each 3- or 4-byte pixel
+    gOffset,       // Index of green byte
+    bOffset,       // Index of blue byte
+    wOffset;       // Index of white byte (same as rOffset if no white)
+  uint32_t
+    endTime;       // Latch timing reference
+#ifdef __AVR__
+  volatile uint8_t
+    *port;         // Output PORT register
+  uint8_t
+    pinMask;       // Output PORT bitmask
+#endif
+
+} Adafruit_NeoPixel;
+// Constructor: number of LEDs, pin number, LED type
+void
+  Adafruit_NeoPixel____init___n_p_t(Adafruit_NeoPixel *this, uint16_t n, uint8_t p, neoPixelType t);
+  // Adafruit_NeoPixel__constructor_n_p_t(Adafruit_NeoPixel *this, uint16_t n, uint8_t p=6, neoPixelType t=NEO_GRB + NEO_KHZ800);
+void
+  Adafruit_NeoPixel____init__(Adafruit_NeoPixel *this);
+void
+  Adafruit_NeoPixel____del__(Adafruit_NeoPixel *this);
+void
+  Adafruit_NeoPixel__begin(Adafruit_NeoPixel *this);
+void
+  Adafruit_NeoPixel__show(Adafruit_NeoPixel *this);
+void
+  Adafruit_NeoPixel__setPin_p(Adafruit_NeoPixel *this, uint8_t p);
+void
+  Adafruit_NeoPixel__setPixelColor_n_r_g_b(Adafruit_NeoPixel *this, uint16_t n, uint8_t r, uint8_t g, uint8_t b);
+void
+  Adafruit_NeoPixel__setPixelColor_n_r_g_b_w(Adafruit_NeoPixel *this, uint16_t n, uint8_t r, uint8_t g, uint8_t b, uint8_t w);
+void
+  Adafruit_NeoPixel__setPixelColor_n_c(Adafruit_NeoPixel *this, uint16_t n, uint32_t c);
+void
+  Adafruit_NeoPixel__setBrightness(Adafruit_NeoPixel *this, uint8_t);
+void
+  Adafruit_NeoPixel__clear(Adafruit_NeoPixel *this);
+void
+  Adafruit_NeoPixel__updateLength_n(Adafruit_NeoPixel *this, uint16_t n);
+void
+  Adafruit_NeoPixel__updateType_t(Adafruit_NeoPixel *this, neoPixelType t);
+
+uint8_t
+  *Adafruit_NeoPixel__getPixels(Adafruit_NeoPixel *this);
+uint8_t
+  Adafruit_NeoPixel__getBrightness(Adafruit_NeoPixel *this);
+int8_t
+  Adafruit_NeoPixel__getPin(Adafruit_NeoPixel *this);
+  // Adafruit_NeoPixel__getPin(Adafruit_NeoPixel *this) { return pin; }
+uint16_t
+  Adafruit_NeoPixel__numPixels(Adafruit_NeoPixel *this);
+uint32_t
+  Adafruit_NeoPixel____static__Color_r_g_b(uint8_t r, uint8_t g, uint8_t b);
+uint32_t
+  Adafruit_NeoPixel____static__Color_r_g_b_w(uint8_t r, uint8_t g, uint8_t b, uint8_t w);
+uint32_t
+  Adafruit_NeoPixel__getPixelColor_n(Adafruit_NeoPixel *this, uint16_t n);
+bool
+// inline bool
+  Adafruit_NeoPixel__canShow(Adafruit_NeoPixel *this);
+  // Adafruit_NeoPixel__canShow(Adafruit_NeoPixel *this) { return (micros() - endTime) >= 50L; }
+
+#endif
 
 #endif // ADAFRUIT_NEOPIXEL_H

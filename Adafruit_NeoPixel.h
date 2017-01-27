@@ -227,7 +227,7 @@ void Adafruit_NeoPixel__clear(Adafruit_NeoPixel *this);
 void Adafruit_NeoPixel__updateLength_n(Adafruit_NeoPixel *this, uint16_t n);
 void Adafruit_NeoPixel__updateType_t(Adafruit_NeoPixel *this, neoPixelType t);
 
-uint8_t * Adafruit_NeoPixel__getPixels(Adafruit_NeoPixel *this);
+uint8_t *Adafruit_NeoPixel__getPixels(Adafruit_NeoPixel *this);
 uint8_t Adafruit_NeoPixel__getBrightness(Adafruit_NeoPixel *this);
 int8_t Adafruit_NeoPixel__getPin(Adafruit_NeoPixel *this);
 // Adafruit_NeoPixel__getPin(Adafruit_NeoPixel *this) { return pin; }

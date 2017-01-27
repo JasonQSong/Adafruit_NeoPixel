@@ -76,42 +76,42 @@ void Adafruit_NeoPixel____del__(Adafruit_NeoPixel *this)
     mgos_gpio_set_mode(this->pin, MGOS_GPIO_MODE_INPUT);
 }
 
-// void Adafruit_NeoPixel::begin(void) {
-//   if(pin >= 0) {
-//     pinMode(pin, OUTPUT);
-//     digitalWrite(pin, LOW);
-//   }
-//   begun = true;
-// }
+void Adafruit_NeoPixel__begin(Adafruit_NeoPixel *this) {
+  if(this->pin >= 0) {
+    mgos_gpio_set_mode(this->pin, MGOS_GPIO_MODE_OUTPUT);
+    mgos_gpio_write(this->pin, 0);
+  }
+  this->begun = true;
+}
 
-// void Adafruit_NeoPixel::updateLength(uint16_t n) {
-//   if(pixels) free(pixels); // Free existing data (if any)
+void Adafruit_NeoPixel__updateLength(Adafruit_NeoPixel *this, uint16_t n) {
+  if(this->pixels) free(this->pixels); // Free existing data (if any)
 
-//   // Allocate new data -- note: ALL PIXELS ARE CLEARED
-//   numBytes = n * ((wOffset == rOffset) ? 3 : 4);
-//   if((pixels = (uint8_t *)malloc(numBytes))) {
-//     memset(pixels, 0, numBytes);
-//     numLEDs = n;
-//   } else {
-//     numLEDs = numBytes = 0;
-//   }
-// }
+  // Allocate new data -- note: ALL PIXELS ARE CLEARED
+  this->numBytes = n * ((this->wOffset == this->rOffset) ? 3 : 4);
+  if((this->pixels = (uint8_t *)malloc(this->numBytes))) {
+    memset(this->pixels, 0, this->numBytes);
+    this->numLEDs = n;
+  } else {
+    this->numLEDs = this->numBytes = 0;
+  }
+}
 
-// void Adafruit_NeoPixel::updateType(neoPixelType t) {
-//   boolean oldThreeBytesPerPixel = (wOffset == rOffset); // false if RGBW
+// void Adafruit_NeoPixel__updateType(neoPixelType t) {
+//   boolean oldThreeBytesPerPixel = (this->wOffset == this->rOffset); // false if RGBW
 
-//   wOffset = (t >> 6) & 0b11; // See notes in header file
-//   rOffset = (t >> 4) & 0b11; // regarding R/G/B/W offsets
-//   gOffset = (t >> 2) & 0b11;
-//   bOffset =  t       & 0b11;
+//   this->wOffset = (t >> 6) & 0b11; // See notes in header file
+//   this->rOffset = (t >> 4) & 0b11; // regarding R/G/B/W offsets
+//   this->gOffset = (t >> 2) & 0b11;
+//   this->bOffset =  t       & 0b11;
 // #ifdef NEO_KHZ400
 //   is800KHz = (t < 256);      // 400 KHz flag is 1<<8
 // #endif
 
 //   // If bytes-per-pixel has changed (and pixel data was previously
 //   // allocated), re-allocate to new size.  Will clear any data.
-//   if(pixels) {
-//     boolean newThreeBytesPerPixel = (wOffset == rOffset);
+//   if(this->pixels) {
+//     boolean newThreeBytesPerPixel = (this->wOffset == this->rOffset);
 //     if(newThreeBytesPerPixel != oldThreeBytesPerPixel) updateLength(numLEDs);
 //   }
 // }
@@ -122,9 +122,9 @@ void Adafruit_NeoPixel____del__(Adafruit_NeoPixel *this)
 //   uint8_t pin, uint8_t *pixels, uint32_t numBytes, uint8_t type);
 // #endif // ESP8266
 
-// void Adafruit_NeoPixel::show(void) {
+// void Adafruit_NeoPixel__show(void) {
 
-//   if(!pixels) return;
+//   if(!this->pixels) return;
 
 //   // Data latch = 50+ microsecond pause in the output stream.  Rather than
 //   // put a delay at the end of the function, the ending time is noted and
@@ -155,7 +155,7 @@ void Adafruit_NeoPixel____del__(Adafruit_NeoPixel *this)
 //   volatile uint16_t
 //     i   = numBytes; // Loop counter
 //   volatile uint8_t
-//    *ptr = pixels,   // Pointer to next byte
+//    *ptr = this->pixels,   // Pointer to next byte
 //     b   = *ptr++,   // Current byte value
 //     hi,             // PORT w/output bit set high
 //     lo;             // PORT w/output bit set low
@@ -196,8 +196,8 @@ void Adafruit_NeoPixel____del__(Adafruit_NeoPixel *this)
 //     if(port == &PORTD) {
 //  #endif // defined(PORTB/C/F)
 
-//       hi = PORTD |  pinMask;
-//       lo = PORTD & ~pinMask;
+//       hi = PORTD |  this->pinMask;
+//       lo = PORTD & ~this->pinMask;
 //       n1 = lo;
 //       if(b & 0x80) n1 = hi;
 
@@ -303,8 +303,8 @@ void Adafruit_NeoPixel____del__(Adafruit_NeoPixel *this)
 //  #endif // defined(PORTD/C/F)
 
 //       // Same as above, just switched to PORTB and stripped of comments.
-//       hi = PORTB |  pinMask;
-//       lo = PORTB & ~pinMask;
+//       hi = PORTB |  this->pinMask;
+//       lo = PORTB & ~this->pinMask;
 //       n1 = lo;
 //       if(b & 0x80) n1 = hi;
 
@@ -394,8 +394,8 @@ void Adafruit_NeoPixel____del__(Adafruit_NeoPixel *this)
 //  #endif // defined(PORTD/B/F)
 
 //       // Same as above, just switched to PORTC and stripped of comments.
-//       hi = PORTC |  pinMask;
-//       lo = PORTC & ~pinMask;
+//       hi = PORTC |  this->pinMask;
+//       lo = PORTC & ~this->pinMask;
 //       n1 = lo;
 //       if(b & 0x80) n1 = hi;
 
@@ -484,8 +484,8 @@ void Adafruit_NeoPixel____del__(Adafruit_NeoPixel *this)
 //     if(port == &PORTF) {
 //  #endif // defined(PORTD/B/C)
 
-//       hi = PORTF |  pinMask;
-//       lo = PORTF & ~pinMask;
+//       hi = PORTF |  this->pinMask;
+//       lo = PORTF & ~this->pinMask;
 //       n1 = lo;
 //       if(b & 0x80) n1 = hi;
 
@@ -579,8 +579,8 @@ void Adafruit_NeoPixel____del__(Adafruit_NeoPixel *this)
 
 //     volatile uint8_t next, bit;
 
-//     hi   = *port |  pinMask;
-//     lo   = *port & ~pinMask;
+//     hi   = *port |  this->pinMask;
+//     lo   = *port & ~this->pinMask;
 //     next = lo;
 //     bit  = 8;
 
@@ -640,8 +640,8 @@ void Adafruit_NeoPixel____del__(Adafruit_NeoPixel *this)
 //     if(port == &PORTD) {
 //  #endif // defined(PORTB/C/F)
 
-//       hi   = PORTD |  pinMask;
-//       lo   = PORTD & ~pinMask;
+//       hi   = PORTD |  this->pinMask;
+//       lo   = PORTD & ~this->pinMask;
 //       next = lo;
 //       if(b & 0x80) next = hi;
 
@@ -706,8 +706,8 @@ void Adafruit_NeoPixel____del__(Adafruit_NeoPixel *this)
 //     if(port == &PORTB) {
 //  #endif // defined(PORTD/C/F)
 
-//       hi   = PORTB |  pinMask;
-//       lo   = PORTB & ~pinMask;
+//       hi   = PORTB |  this->pinMask;
+//       lo   = PORTB & ~this->pinMask;
 //       next = lo;
 //       if(b & 0x80) next = hi;
 
@@ -769,8 +769,8 @@ void Adafruit_NeoPixel____del__(Adafruit_NeoPixel *this)
 //     if(port == &PORTC) {
 //  #endif // defined(PORTD/B/F)
 
-//       hi   = PORTC |  pinMask;
-//       lo   = PORTC & ~pinMask;
+//       hi   = PORTC |  this->pinMask;
+//       lo   = PORTC & ~this->pinMask;
 //       next = lo;
 //       if(b & 0x80) next = hi;
 
@@ -832,8 +832,8 @@ void Adafruit_NeoPixel____del__(Adafruit_NeoPixel *this)
 //     if(port == &PORTF) {
 //  #endif // defined(PORTD/B/C)
 
-//       hi   = PORTF |  pinMask;
-//       lo   = PORTF & ~pinMask;
+//       hi   = PORTF |  this->pinMask;
+//       lo   = PORTF & ~this->pinMask;
 //       next = lo;
 //       if(b & 0x80) next = hi;
 
@@ -893,8 +893,8 @@ void Adafruit_NeoPixel____del__(Adafruit_NeoPixel *this)
 
 //     volatile uint8_t next, bit;
 
-//     hi   = *port |  pinMask;
-//     lo   = *port & ~pinMask;
+//     hi   = *port |  this->pinMask;
+//     lo   = *port & ~this->pinMask;
 //     next = lo;
 //     bit  = 8;
 
@@ -950,8 +950,8 @@ void Adafruit_NeoPixel____del__(Adafruit_NeoPixel *this)
 
 //     volatile uint8_t next, bit;
 
-//     hi   = *port |  pinMask;
-//     lo   = *port & ~pinMask;
+//     hi   = *port |  this->pinMask;
+//     lo   = *port & ~this->pinMask;
 //     next = lo;
 //     bit  = 8;
 
@@ -997,8 +997,8 @@ void Adafruit_NeoPixel____del__(Adafruit_NeoPixel *this)
 
 //     volatile uint8_t next, bit;
 
-//     hi   = *port |  pinMask;
-//     lo   = *port & ~pinMask;
+//     hi   = *port |  this->pinMask;
+//     lo   = *port & ~this->pinMask;
 //     next = lo;
 //     bit  = 8;
 
@@ -1065,10 +1065,10 @@ void Adafruit_NeoPixel____del__(Adafruit_NeoPixel *this)
 // #define CYCLES_400_T1H  (F_CPU /  833333)
 // #define CYCLES_400      (F_CPU /  400000)
 
-//   uint8_t          *p   = pixels,
+//   uint8_t          *p   = this->pixels,
 //                    *end = p + numBytes, pix, mask;
-//   volatile uint8_t *set = portSetRegister(pin),
-//                    *clr = portClearRegister(pin);
+//   volatile uint8_t *set = portSetRegister(this->pin),
+//                    *clr = portClearRegister(this->pin);
 //   uint32_t          cyc;
 
 //   ARM_DEMCR    |= ARM_DEMCR_TRCENA;
@@ -1117,10 +1117,10 @@ void Adafruit_NeoPixel____del__(Adafruit_NeoPixel *this)
 // #elif defined(__MKL26Z64__) // Teensy-LC
 
 // #if F_CPU == 48000000
-//   uint8_t          *p   = pixels,
+//   uint8_t          *p   = this->pixels,
 // 		   pix, count, dly,
-//                    bitmask = digitalPinToBitMask(pin);
-//   volatile uint8_t *reg = portSetRegister(pin);
+//                    bitmask = digitalPinToBitMask(this->pin);
+//   volatile uint8_t *reg = portSetRegister(this->pin);
 //   uint32_t         num = numBytes;
 //   asm volatile(
 // 	"L%=_begin:"				"\n\t"
@@ -1205,11 +1205,11 @@ void Adafruit_NeoPixel____del__(Adafruit_NeoPixel *this)
 //   // resolution.  So yay, you get a load of goofball NOPs...
 
 //   uint8_t  *ptr, *end, p, bitMask, portNum;
-//   uint32_t  pinMask;
+//   uint32_t  this->pinMask;
 
-//   portNum =  g_APinDescription[pin].ulPort;
-//   pinMask =  1ul << g_APinDescription[pin].ulPin;
-//   ptr     =  pixels;
+//   portNum =  g_APinDescription[this->pin].ulPort;
+//   this->pinMask =  1ul << g_APinDescription[this->pin].ulPin;
+//   ptr     =  this->pixels;
 //   end     =  ptr + numBytes;
 //   p       = *ptr++;
 //   bitMask =  0x80;
@@ -1221,15 +1221,15 @@ void Adafruit_NeoPixel____del__(Adafruit_NeoPixel *this)
 //   if(is800KHz) {
 // #endif
 //     for(;;) {
-//       *set = pinMask;
+//       *set = this->pinMask;
 //       asm("nop; nop; nop; nop; nop; nop; nop; nop;");
 //       if(p & bitMask) {
 //         asm("nop; nop; nop; nop; nop; nop; nop; nop;"
 //             "nop; nop; nop; nop; nop; nop; nop; nop;"
 //             "nop; nop; nop; nop;");
-//         *clr = pinMask;
+//         *clr = this->pinMask;
 //       } else {
-//         *clr = pinMask;
+//         *clr = this->pinMask;
 //         asm("nop; nop; nop; nop; nop; nop; nop; nop;"
 //             "nop; nop; nop; nop; nop; nop; nop; nop;"
 //             "nop; nop; nop; nop;");
@@ -1245,16 +1245,16 @@ void Adafruit_NeoPixel____del__(Adafruit_NeoPixel *this)
 // #ifdef NEO_KHZ400
 //   } else { // 400 KHz bitstream
 //     for(;;) {
-//       *set = pinMask;
+//       *set = this->pinMask;
 //       asm("nop; nop; nop; nop; nop; nop; nop; nop; nop; nop; nop;");
 //       if(p & bitMask) {
 //         asm("nop; nop; nop; nop; nop; nop; nop; nop;"
 //             "nop; nop; nop; nop; nop; nop; nop; nop;"
 //             "nop; nop; nop; nop; nop; nop; nop; nop;"
 //             "nop; nop; nop;");
-//         *clr = pinMask;
+//         *clr = this->pinMask;
 //       } else {
-//         *clr = pinMask;
+//         *clr = this->pinMask;
 //         asm("nop; nop; nop; nop; nop; nop; nop; nop;"
 //             "nop; nop; nop; nop; nop; nop; nop; nop;"
 //             "nop; nop; nop; nop; nop; nop; nop; nop;"
@@ -1281,16 +1281,16 @@ void Adafruit_NeoPixel____del__(Adafruit_NeoPixel *this)
 //   // resolution.  So yay, you get a load of goofball NOPs...
 
 //   uint8_t  *ptr, *end, p, bitMask;
-//   uint32_t  pinMask;
+//   uint32_t  this->pinMask;
 
-//   pinMask =  BIT(PIN_MAP[pin].gpio_bit);
-//   ptr     =  pixels;
+//   this->pinMask =  BIT(PIN_MAP[this->pin].gpio_bit);
+//   ptr     =  this->pixels;
 //   end     =  ptr + numBytes;
 //   p       = *ptr++;
 //   bitMask =  0x80;
 
-//   volatile uint16_t *set = &(PIN_MAP[pin].gpio_device->regs->BSRRL);
-//   volatile uint16_t *clr = &(PIN_MAP[pin].gpio_device->regs->BSRRH);
+//   volatile uint16_t *set = &(PIN_MAP[this->pin].gpio_device->regs->BSRRL);
+//   volatile uint16_t *clr = &(PIN_MAP[this->pin].gpio_device->regs->BSRRH);
 
 // #ifdef NEO_KHZ400 // 800 KHz check needed only if 400 KHz support enabled
 //   if(is800KHz) {
@@ -1298,7 +1298,7 @@ void Adafruit_NeoPixel____del__(Adafruit_NeoPixel *this)
 //     for(;;) {
 //       if(p & bitMask) { // ONE
 //         // High 800ns
-//         *set = pinMask;
+//         *set = this->pinMask;
 //         asm("nop; nop; nop; nop; nop; nop; nop; nop;"
 //             "nop; nop; nop; nop; nop; nop; nop; nop;"
 //             "nop; nop; nop; nop; nop; nop; nop; nop;"
@@ -1312,7 +1312,7 @@ void Adafruit_NeoPixel____del__(Adafruit_NeoPixel *this)
 //             "nop; nop; nop; nop; nop; nop; nop; nop;"
 //             "nop; nop; nop; nop; nop; nop;");
 //         // Low 450ns
-//         *clr = pinMask;
+//         *clr = this->pinMask;
 //         asm("nop; nop; nop; nop; nop; nop; nop; nop;"
 //             "nop; nop; nop; nop; nop; nop; nop; nop;"
 //             "nop; nop; nop; nop; nop; nop; nop; nop;"
@@ -1320,7 +1320,7 @@ void Adafruit_NeoPixel____del__(Adafruit_NeoPixel *this)
 //             "nop; nop; nop; nop; nop; nop;");
 //       } else { // ZERO
 //         // High 400ns
-//         *set = pinMask;
+//         *set = this->pinMask;
 //         asm("nop; nop; nop; nop; nop; nop; nop; nop;"
 //             "nop; nop; nop; nop; nop; nop; nop; nop;"
 //             "nop; nop; nop; nop; nop; nop; nop; nop;"
@@ -1328,7 +1328,7 @@ void Adafruit_NeoPixel____del__(Adafruit_NeoPixel *this)
 //             "nop; nop; nop; nop; nop; nop; nop; nop;"
 //             "nop;");
 //         // Low 850ns
-//         *clr = pinMask;
+//         *clr = this->pinMask;
 //         asm("nop; nop; nop; nop; nop; nop; nop; nop;"
 //             "nop; nop; nop; nop; nop; nop; nop; nop;"
 //             "nop; nop; nop; nop; nop; nop; nop; nop;"
@@ -1368,7 +1368,7 @@ void Adafruit_NeoPixel____del__(Adafruit_NeoPixel *this)
 //   #define TIME_400_1 ((int)(1.20 * SCALE + 0.5) - (5 * INST))
 //   #define PERIOD_400 ((int)(2.50 * SCALE + 0.5) - (5 * INST))
 
-//   int             pinMask, time0, time1, period, t;
+//   int             this->pinMask, time0, time1, period, t;
 //   Pio            *port;
 //   volatile WoReg *portSet, *portClear, *timeValue, *timeReset;
 //   uint8_t        *p, *end, pix, mask;
@@ -1379,13 +1379,13 @@ void Adafruit_NeoPixel____del__(Adafruit_NeoPixel *this)
 //     TC_CMR_WAVE | TC_CMR_WAVSEL_UP | TC_CMR_TCCLKS_TIMER_CLOCK1);
 //   TC_Start(TC1, 0);
 
-//   pinMask   = g_APinDescription[pin].ulPin; // Don't 'optimize' these into
-//   port      = g_APinDescription[pin].pPort; // declarations above.  Want to
+//   this->pinMask   = g_APinDescription[this->pin].ulPin; // Don't 'optimize' these into
+//   port      = g_APinDescription[this->pin].pPort; // declarations above.  Want to
 //   portSet   = &(port->PIO_SODR);            // burn a few cycles after
 //   portClear = &(port->PIO_CODR);            // starting timer to minimize
 //   timeValue = &(TC1->TC_CHANNEL[0].TC_CV);  // the initial 'while'.
 //   timeReset = &(TC1->TC_CHANNEL[0].TC_CCR);
-//   p         =  pixels;
+//   p         =  this->pixels;
 //   end       =  p + numBytes;
 //   pix       = *p++;
 //   mask      = 0x80;
@@ -1407,10 +1407,10 @@ void Adafruit_NeoPixel____del__(Adafruit_NeoPixel *this)
 //   for(t = time0;; t = time0) {
 //     if(pix & mask) t = time1;
 //     while(*timeValue < period);
-//     *portSet   = pinMask;
+//     *portSet   = this->pinMask;
 //     *timeReset = TC_CCR_CLKEN | TC_CCR_SWTRG;
 //     while(*timeValue < t);
-//     *portClear = pinMask;
+//     *portClear = this->pinMask;
 //     if(!(mask >>= 1)) {   // This 'inside-out' loop logic utilizes
 //       if(p >= end) break; // idle time to minimize inter-byte delays.
 //       pix = *p++;
@@ -1429,7 +1429,7 @@ void Adafruit_NeoPixel____del__(Adafruit_NeoPixel *this)
 // // ESP8266 ----------------------------------------------------------------
 
 //   // ESP8266 show() is external to enforce ICACHE_RAM_ATTR execution
-//   espShow(pin, pixels, numBytes, is800KHz);
+//   espShow(this->pin, this->pixels, numBytes, is800KHz);
 
 // #elif defined(__ARDUINO_ARC__)
 
@@ -1440,9 +1440,9 @@ void Adafruit_NeoPixel____del__(Adafruit_NeoPixel *this)
 //   __builtin_arc_nop(); __builtin_arc_nop(); \
 //   __builtin_arc_nop(); __builtin_arc_nop(); }
 
-//   PinDescription *pindesc = &g_APinDescription[pin];
+//   PinDescription *pindesc = &g_APinDescription[this->pin];
 //   register uint32_t loop = 8 * numBytes; // one loop to handle all bytes and all bits
-//   register uint8_t *p = pixels;
+//   register uint8_t *p = this->pixels;
 //   register uint32_t currByte = (uint32_t) (*p);
 //   register uint32_t currBit = 0x80 & currByte;
 //   register uint32_t bitCounter = 0;
@@ -1534,21 +1534,21 @@ void Adafruit_NeoPixel____del__(Adafruit_NeoPixel *this)
 // }
 
 // // Set the output pin number
-// void Adafruit_NeoPixel::setPin(uint8_t p) {
-//   if(begun && (pin >= 0)) pinMode(pin, INPUT);
-//     pin = p;
-//     if(begun) {
-//       pinMode(p, OUTPUT);
-//       digitalWrite(p, LOW);
+// void Adafruit_NeoPixel__setPin(uint8_t p) {
+//   if(this->begun && (this->pin >= 0)) mgos_gpio_set_mode(this->pin, MGOS_GPIO_MODE_INPUT);
+//     this->pin = p;
+//     if(this->begun) {
+//       mgos_gpio_set_mode(p, MGOS_GPIO_MODE_OUTPUT);
+//       mgos_gpio_write(p, 0)
 //     }
 // #ifdef __AVR__
 //     port    = portOutputRegister(digitalPinToPort(p));
-//     pinMask = digitalPinToBitMask(p);
+//     this->pinMask = digitalPinToBitMask(p);
 // #endif
 // }
 
 // // Set pixel color from separate R,G,B components:
-// void Adafruit_NeoPixel::setPixelColor(
+// void Adafruit_NeoPixel__setPixelColor(
 //  uint16_t n, uint8_t r, uint8_t g, uint8_t b) {
 
 //   if(n < numLEDs) {
@@ -1558,19 +1558,19 @@ void Adafruit_NeoPixel____del__(Adafruit_NeoPixel *this)
 //       b = (b * brightness) >> 8;
 //     }
 //     uint8_t *p;
-//     if(wOffset == rOffset) { // Is an RGB-type strip
-//       p = &pixels[n * 3];    // 3 bytes per pixel
+//     if(this->wOffset == this->rOffset) { // Is an RGB-type strip
+//       p = &this->pixels[n * 3];    // 3 bytes per pixel
 //     } else {                 // Is a WRGB-type strip
-//       p = &pixels[n * 4];    // 4 bytes per pixel
-//       p[wOffset] = 0;        // But only R,G,B passed -- set W to 0
+//       p = &this->pixels[n * 4];    // 4 bytes per pixel
+//       p[this->wOffset] = 0;        // But only R,G,B passed -- set W to 0
 //     }
-//     p[rOffset] = r;          // R,G,B always stored
-//     p[gOffset] = g;
-//     p[bOffset] = b;
+//     p[this->rOffset] = r;          // R,G,B always stored
+//     p[this->gOffset] = g;
+//     p[this->bOffset] = b;
 //   }
 // }
 
-// void Adafruit_NeoPixel::setPixelColor(
+// void Adafruit_NeoPixel__setPixelColor(
 //  uint16_t n, uint8_t r, uint8_t g, uint8_t b, uint8_t w) {
 
 //   if(n < numLEDs) {
@@ -1581,20 +1581,20 @@ void Adafruit_NeoPixel____del__(Adafruit_NeoPixel *this)
 //       w = (w * brightness) >> 8;
 //     }
 //     uint8_t *p;
-//     if(wOffset == rOffset) { // Is an RGB-type strip
-//       p = &pixels[n * 3];    // 3 bytes per pixel (ignore W)
+//     if(this->wOffset == this->rOffset) { // Is an RGB-type strip
+//       p = &this->pixels[n * 3];    // 3 bytes per pixel (ignore W)
 //     } else {                 // Is a WRGB-type strip
-//       p = &pixels[n * 4];    // 4 bytes per pixel
-//       p[wOffset] = w;        // Store W
+//       p = &this->pixels[n * 4];    // 4 bytes per pixel
+//       p[this->wOffset] = w;        // Store W
 //     }
-//     p[rOffset] = r;          // Store R,G,B
-//     p[gOffset] = g;
-//     p[bOffset] = b;
+//     p[this->rOffset] = r;          // Store R,G,B
+//     p[this->gOffset] = g;
+//     p[this->bOffset] = b;
 //   }
 // }
 
 // // Set pixel color from 'packed' 32-bit RGB color:
-// void Adafruit_NeoPixel::setPixelColor(uint16_t n, uint32_t c) {
+// void Adafruit_NeoPixel__setPixelColor(uint16_t n, uint32_t c) {
 //   if(n < numLEDs) {
 //     uint8_t *p,
 //       r = (uint8_t)(c >> 16),
@@ -1605,66 +1605,66 @@ void Adafruit_NeoPixel____del__(Adafruit_NeoPixel *this)
 //       g = (g * brightness) >> 8;
 //       b = (b * brightness) >> 8;
 //     }
-//     if(wOffset == rOffset) {
-//       p = &pixels[n * 3];
+//     if(this->wOffset == this->rOffset) {
+//       p = &this->pixels[n * 3];
 //     } else {
-//       p = &pixels[n * 4];
+//       p = &this->pixels[n * 4];
 //       uint8_t w = (uint8_t)(c >> 24);
-//       p[wOffset] = brightness ? ((w * brightness) >> 8) : w;
+//       p[this->wOffset] = brightness ? ((w * brightness) >> 8) : w;
 //     }
-//     p[rOffset] = r;
-//     p[gOffset] = g;
-//     p[bOffset] = b;
+//     p[this->rOffset] = r;
+//     p[this->gOffset] = g;
+//     p[this->bOffset] = b;
 //   }
 // }
 
 // // Convert separate R,G,B into packed 32-bit RGB color.
 // // Packed format is always RGB, regardless of LED strand color order.
-// uint32_t Adafruit_NeoPixel::Color(uint8_t r, uint8_t g, uint8_t b) {
+// uint32_t Adafruit_NeoPixel__Color(uint8_t r, uint8_t g, uint8_t b) {
 //   return ((uint32_t)r << 16) | ((uint32_t)g <<  8) | b;
 // }
 
 // // Convert separate R,G,B,W into packed 32-bit WRGB color.
 // // Packed format is always WRGB, regardless of LED strand color order.
-// uint32_t Adafruit_NeoPixel::Color(uint8_t r, uint8_t g, uint8_t b, uint8_t w) {
+// uint32_t Adafruit_NeoPixel__Color(uint8_t r, uint8_t g, uint8_t b, uint8_t w) {
 //   return ((uint32_t)w << 24) | ((uint32_t)r << 16) | ((uint32_t)g <<  8) | b;
 // }
 
 // // Query color from previously-set pixel (returns packed 32-bit RGB value)
-// uint32_t Adafruit_NeoPixel::getPixelColor(uint16_t n) const {
+// uint32_t Adafruit_NeoPixel__getPixelColor(uint16_t n) const {
 //   if(n >= numLEDs) return 0; // Out of bounds, return no color.
 
 //   uint8_t *p;
 
-//   if(wOffset == rOffset) { // Is RGB-type device
-//     p = &pixels[n * 3];
+//   if(this->wOffset == this->rOffset) { // Is RGB-type device
+//     p = &this->pixels[n * 3];
 //     if(brightness) {
 //       // Stored color was decimated by setBrightness().  Returned value
 //       // attempts to scale back to an approximation of the original 24-bit
 //       // value used when setting the pixel color, but there will always be
 //       // some error -- those bits are simply gone.  Issue is most
 //       // pronounced at low brightness levels.
-//       return (((uint32_t)(p[rOffset] << 8) / brightness) << 16) |
-//              (((uint32_t)(p[gOffset] << 8) / brightness) <<  8) |
-//              ( (uint32_t)(p[bOffset] << 8) / brightness       );
+//       return (((uint32_t)(p[this->rOffset] << 8) / brightness) << 16) |
+//              (((uint32_t)(p[this->gOffset] << 8) / brightness) <<  8) |
+//              ( (uint32_t)(p[this->bOffset] << 8) / brightness       );
 //     } else {
 //       // No brightness adjustment has been made -- return 'raw' color
-//       return ((uint32_t)p[rOffset] << 16) |
-//              ((uint32_t)p[gOffset] <<  8) |
-//               (uint32_t)p[bOffset];
+//       return ((uint32_t)p[this->rOffset] << 16) |
+//              ((uint32_t)p[this->gOffset] <<  8) |
+//               (uint32_t)p[this->bOffset];
 //     }
 //   } else {                 // Is RGBW-type device
-//     p = &pixels[n * 4];
+//     p = &this->pixels[n * 4];
 //     if(brightness) { // Return scaled color
-//       return (((uint32_t)(p[wOffset] << 8) / brightness) << 24) |
-//              (((uint32_t)(p[rOffset] << 8) / brightness) << 16) |
-//              (((uint32_t)(p[gOffset] << 8) / brightness) <<  8) |
-//              ( (uint32_t)(p[bOffset] << 8) / brightness       );
+//       return (((uint32_t)(p[this->wOffset] << 8) / brightness) << 24) |
+//              (((uint32_t)(p[this->rOffset] << 8) / brightness) << 16) |
+//              (((uint32_t)(p[this->gOffset] << 8) / brightness) <<  8) |
+//              ( (uint32_t)(p[this->bOffset] << 8) / brightness       );
 //     } else { // Return raw color
-//       return ((uint32_t)p[wOffset] << 24) |
-//              ((uint32_t)p[rOffset] << 16) |
-//              ((uint32_t)p[gOffset] <<  8) |
-//               (uint32_t)p[bOffset];
+//       return ((uint32_t)p[this->wOffset] << 24) |
+//              ((uint32_t)p[this->rOffset] << 16) |
+//              ((uint32_t)p[this->gOffset] <<  8) |
+//               (uint32_t)p[this->bOffset];
 //     }
 //   }
 // }
@@ -1672,11 +1672,11 @@ void Adafruit_NeoPixel____del__(Adafruit_NeoPixel *this)
 // // Returns pointer to pixels[] array.  Pixel data is stored in device-
 // // native format and is not translated here.  Application will need to be
 // // aware of specific pixel data format and handle colors appropriately.
-// uint8_t *Adafruit_NeoPixel::getPixels(void) const {
-//   return pixels;
+// uint8_t *Adafruit_NeoPixel__getPixels(void) const {
+//   return this->pixels;
 // }
 
-// uint16_t Adafruit_NeoPixel::numPixels(void) const {
+// uint16_t Adafruit_NeoPixel__numPixels(void) const {
 //   return numLEDs;
 // }
 
@@ -1692,7 +1692,7 @@ void Adafruit_NeoPixel____del__(Adafruit_NeoPixel *this)
 // // the limited number of steps (quantization) in the old data will be
 // // quite visible in the re-scaled version.  For a non-destructive
 // // change, you'll need to re-render the full strip data.  C'est la vie.
-// void Adafruit_NeoPixel::setBrightness(uint8_t b) {
+// void Adafruit_NeoPixel__setBrightness(uint8_t b) {
 //   // Stored brightness value is different than what's passed.
 //   // This simplifies the actual scaling math later, allowing a fast
 //   // 8x8-bit multiply and taking the MSB.  'brightness' is a uint8_t,
@@ -1703,7 +1703,7 @@ void Adafruit_NeoPixel____del__(Adafruit_NeoPixel *this)
 //   if(newBrightness != brightness) { // Compare against prior value
 //     // Brightness has changed -- re-scale existing data in RAM
 //     uint8_t  c,
-//             *ptr           = pixels,
+//             *ptr           = this->pixels,
 //              oldBrightness = brightness - 1; // De-wrap old brightness value
 //     uint16_t scale;
 //     if(oldBrightness == 0) scale = 0; // Avoid /0
@@ -1718,10 +1718,10 @@ void Adafruit_NeoPixel____del__(Adafruit_NeoPixel *this)
 // }
 
 // //Return the brightness value
-// uint8_t Adafruit_NeoPixel::getBrightness(void) const {
+// uint8_t Adafruit_NeoPixel__getBrightness(void) const {
 //   return brightness - 1;
 // }
 
-// void Adafruit_NeoPixel::clear() {
-//   memset(pixels, 0, numBytes);
+// void Adafruit_NeoPixel__clear() {
+//   memset(this->pixels, 0, numBytes);
 // }

@@ -20,21 +20,33 @@
 #define ADAFRUIT_NEOPIXEL_H
 
 #if defined(__cplusplus)
+
 #if (ARDUINO >= 100)
 #include <Arduino.h>
 #else
 #include <WProgram.h>
 #include <pins_arduino.h>
 #endif
-#else
+
+#else // if defined(__cplusplus)
+
+#define MONGOOSE_OS
+
 #include <stdlib.h>
 #include <inttypes.h>
 #include <stdbool.h>
+#include <string.h>
 // #include <stdio.h>
+#define boolean bool
+
+#ifdef MONGOOSE_OS
 // #include "common/platform.h"
 // #include "common/cs_file.h"
 #include "fw/src/mgos_gpio.h"
 #endif
+
+
+#endif // if defined(__cplusplus)
 
 // The order of primary colors in the NeoPixel data stream can vary
 // among device types, manufacturers and even different revisions of
@@ -230,13 +242,13 @@ void Adafruit_NeoPixel__updateType_t(Adafruit_NeoPixel *this, neoPixelType t);
 uint8_t *Adafruit_NeoPixel__getPixels(Adafruit_NeoPixel *this);
 uint8_t Adafruit_NeoPixel__getBrightness(Adafruit_NeoPixel *this);
 int8_t Adafruit_NeoPixel__getPin(Adafruit_NeoPixel *this);
-// Adafruit_NeoPixel__getPin(Adafruit_NeoPixel *this) { return pin; }
+// int8_t Adafruit_NeoPixel__getPin(Adafruit_NeoPixel *this) { return pin; }
 uint16_t Adafruit_NeoPixel__numPixels(Adafruit_NeoPixel *this);
 uint32_t Adafruit_NeoPixel____static__Color_r_g_b(uint8_t r, uint8_t g, uint8_t b);
 uint32_t Adafruit_NeoPixel____static__Color_r_g_b_w(uint8_t r, uint8_t g, uint8_t b, uint8_t w);
 uint32_t Adafruit_NeoPixel__getPixelColor_n(Adafruit_NeoPixel *this, uint16_t n);
 bool Adafruit_NeoPixel____inline__canShow(Adafruit_NeoPixel *this);
-// Adafruit_NeoPixel__canShow(Adafruit_NeoPixel *this) { return (micros() - endTime) >= 50L; }
+// bool Adafruit_NeoPixel__canShow(Adafruit_NeoPixel *this) { return (micros() - endTime) >= 50L; }
 
 #endif
 

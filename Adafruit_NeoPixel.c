@@ -81,7 +81,7 @@ void Adafruit_NeoPixel__begin(Adafruit_NeoPixel *this)
   if (this->pin >= 0)
   {
     pinMode(this->pin, OUTPUT);
-    digitalWrite(this->pin, 0);
+    digitalWrite(this->pin, LOW);
   }
   this->begun = true;
 }
@@ -137,7 +137,7 @@ void Adafruit_NeoPixel__setPin_p(Adafruit_NeoPixel *this, uint8_t p)
   if (this->begun)
   {
     pinMode(p, OUTPUT);
-    digitalWrite(p, 0);
+    digitalWrite(p, LOW);
   }
 #ifdef __AVR__
   port = portOutputRegister(digitalPinToPort(p));
@@ -161,11 +161,11 @@ void Adafruit_NeoPixel__setPixelColor_n_r_g_b(Adafruit_NeoPixel *this,
     uint8_t *p;
     if (this->wOffset == this->rOffset)
     {                           // Is an RGB-type strip
-      p = &this->pixels[n * 3]; // 3 bytes per pixel
+      p = &(this->pixels[n * 3]); // 3 bytes per pixel
     }
     else
     {                           // Is a WRGB-type strip
-      p = &this->pixels[n * 4]; // 4 bytes per pixel
+      p = &(this->pixels[n * 4]); // 4 bytes per pixel
       p[this->wOffset] = 0;     // But only R,G,B passed -- set W to 0
     }
     p[this->rOffset] = r; // R,G,B always stored
@@ -190,11 +190,11 @@ void Adafruit_NeoPixel__setPixelColor_n_r_g_b_w(Adafruit_NeoPixel *this,
     uint8_t *p;
     if (this->wOffset == this->rOffset)
     {                           // Is an RGB-type strip
-      p = &this->pixels[n * 3]; // 3 bytes per pixel (ignore W)
+      p = &(this->pixels[n * 3]); // 3 bytes per pixel (ignore W)
     }
     else
     {                           // Is a WRGB-type strip
-      p = &this->pixels[n * 4]; // 4 bytes per pixel
+      p = &(this->pixels[n * 4]); // 4 bytes per pixel
       p[this->wOffset] = w;     // Store W
     }
     p[this->rOffset] = r; // Store R,G,B
@@ -220,11 +220,11 @@ void Adafruit_NeoPixel__setPixelColor_n_c(Adafruit_NeoPixel *this, uint16_t n, u
     }
     if (this->wOffset == this->rOffset)
     {
-      p = &this->pixels[n * 3];
+      p = &(this->pixels[n * 3]);
     }
     else
     {
-      p = &this->pixels[n * 4];
+      p = &(this->pixels[n * 4]);
       uint8_t w = (uint8_t)(c >> 24);
       p[this->wOffset] = this->brightness ? ((w * this->brightness) >> 8) : w;
     }
@@ -258,21 +258,21 @@ uint32_t Adafruit_NeoPixel__getPixelColor_n(Adafruit_NeoPixel *this, uint16_t n)
 
   if (this->wOffset == this->rOffset)
   { // Is RGB-type device
-    p = &this->pixels[n * 3];
+    p = &(this->pixels[n * 3]);
     if (this->brightness)
     {
       // Stored color was decimated by setBrightness().  Returned value
       // attempts to scale back to an approximation of the original 24-bit
       // value used when setting the pixel color, but there will always be
       // some error -- those bits are simply gone.  Issue is most
-      // pronounced at low this->brightness levels.
+      // pronounced at low brightness levels.
       return (((uint32_t)(p[this->rOffset] << 8) / this->brightness) << 16) |
              (((uint32_t)(p[this->gOffset] << 8) / this->brightness) << 8) |
              ((uint32_t)(p[this->bOffset] << 8) / this->brightness);
     }
     else
     {
-      // No this->brightness adjustment has been made -- return 'raw' color
+      // No brightness adjustment has been made -- return 'raw' color
       return ((uint32_t)p[this->rOffset] << 16) |
              ((uint32_t)p[this->gOffset] << 8) |
              (uint32_t)p[this->bOffset];
@@ -280,7 +280,7 @@ uint32_t Adafruit_NeoPixel__getPixelColor_n(Adafruit_NeoPixel *this, uint16_t n)
   }
   else
   { // Is RGBW-type device
-    p = &this->pixels[n * 4];
+    p = &(this->pixels[n * 4]);
     if (this->brightness)
     { // Return scaled color
       return (((uint32_t)(p[this->wOffset] << 8) / this->brightness) << 24) |

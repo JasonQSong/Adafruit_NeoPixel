@@ -73,15 +73,15 @@ void Adafruit_NeoPixel____del__(Adafruit_NeoPixel *this)
   if (this->pixels)
     free(this->pixels);
   if (this->pin >= 0)
-    mgos_gpio_set_mode(this->pin, MGOS_GPIO_MODE_INPUT);
+    pinMode(this->pin, INPUT);
 }
 
 void Adafruit_NeoPixel__begin(Adafruit_NeoPixel *this)
 {
   if (this->pin >= 0)
   {
-    mgos_gpio_set_mode(this->pin, MGOS_GPIO_MODE_OUTPUT);
-    mgos_gpio_write(this->pin, 0);
+    pinMode(this->pin, OUTPUT);
+    digitalWrite(this->pin, 0);
   }
   this->begun = true;
 }
@@ -132,12 +132,12 @@ void Adafruit_NeoPixel__updateType_t(Adafruit_NeoPixel *this, neoPixelType t)
 void Adafruit_NeoPixel__setPin_p(Adafruit_NeoPixel *this, uint8_t p)
 {
   if (this->begun && (this->pin >= 0))
-    mgos_gpio_set_mode(this->pin, MGOS_GPIO_MODE_INPUT);
+    pinMode(this->pin, INPUT);
   this->pin = p;
   if (this->begun)
   {
-    mgos_gpio_set_mode(p, MGOS_GPIO_MODE_OUTPUT);
-    mgos_gpio_write(p, 0);
+    pinMode(p, OUTPUT);
+    digitalWrite(p, 0);
   }
 #ifdef __AVR__
   port = portOutputRegister(digitalPinToPort(p));

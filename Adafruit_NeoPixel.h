@@ -40,6 +40,7 @@
 #define boolean bool
 
 #ifdef MONGOOSE_OS
+#include "mgos_arduino_interface.h"
 // #include "common/platform.h"
 // #include "common/cs_file.h"
 #include "fw/src/mgos_gpio.h"

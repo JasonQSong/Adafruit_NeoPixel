@@ -17,7 +17,7 @@ static inline uint32_t _getCycleCount(void)
     return ccount;
 }
 
-void ICACHE_FLASH_ATTR espShow(
+void espShow(
     uint8_t pin, uint8_t *pixels, uint32_t numBytes, boolean is800KHz)
 {
 
@@ -31,7 +31,7 @@ void ICACHE_FLASH_ATTR espShow(
     uint8_t *p, *end, pix, mask;
     uint32_t t, time0, time1, period, c, startTime, pinMask;
 
-    pinMask = (1UL << (pin));
+    pinMask = _BV(pin);
     p = pixels;
     end = p + numBytes;
     pix = *p++;
@@ -113,10 +113,10 @@ void Adafruit_NeoPixel__show(Adafruit_NeoPixel *this)
 
     interrupts();
 
-    this->endTime = NOW(); // Save EOD time for latch on next call
+    this->endTime = micros(); // Save EOD time for latch on next call
 }
 
 bool Adafruit_NeoPixel____inline__canShow(Adafruit_NeoPixel *this)
 {
-    return (NOW() - this->endTime) >= 50L;
+    return (micros() - this->endTime) >= 50L;
 }

@@ -10,4 +10,6 @@
 
 #define micros NOW
 
+#define F_CPU (SYS_CPU_80MHZ * 10000000L)
+
 #endif

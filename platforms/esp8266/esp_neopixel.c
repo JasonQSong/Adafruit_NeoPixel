@@ -4,10 +4,6 @@
 
 #include "esp_neopixel.h"
 
-#include <eagle_soc.h>
-#include <user_interface.h>
-#include <c_types.h>
-
 static uint32_t _getCycleCount(void) __attribute__((always_inline));
 static inline uint32_t _getCycleCount(void)
 {
@@ -21,12 +17,12 @@ void espShow(
     uint8_t pin, uint8_t *pixels, uint32_t numBytes, boolean is800KHz)
 {
 
-#define CYCLES_800_T0H (SYS_CPU_80MHZ * 1000000 / 2500000) // 0.4us
-#define CYCLES_800_T1H (SYS_CPU_80MHZ * 1000000 / 1250000) // 0.8us
-#define CYCLES_800 (SYS_CPU_80MHZ * 1000000 / 800000)      // 1.25us per bit
-#define CYCLES_400_T0H (SYS_CPU_80MHZ * 1000000 / 2000000) // 0.5uS
-#define CYCLES_400_T1H (SYS_CPU_80MHZ * 1000000 / 833333)  // 1.2us
-#define CYCLES_400 (SYS_CPU_80MHZ * 1000000 / 400000)      // 2.5us per bit
+#define CYCLES_800_T0H (F_CPU / 2500000) // 0.4us
+#define CYCLES_800_T1H (F_CPU / 1250000) // 0.8us
+#define CYCLES_800 (F_CPU / 800000)      // 1.25us per bit
+#define CYCLES_400_T0H (F_CPU / 2000000) // 0.5uS
+#define CYCLES_400_T1H (F_CPU / 833333)  // 1.2us
+#define CYCLES_400 (F_CPU / 400000)      // 2.5us per bit
 
     uint8_t *p, *end, pix, mask;
     uint32_t t, time0, time1, period, c, startTime, pinMask;
@@ -38,11 +34,14 @@ void espShow(
     mask = 0x80;
     startTime = 0;
 
+#ifdef NEO_KHZ400
     if (is800KHz)
     {
+#endif
         time0 = CYCLES_800_T0H;
         time1 = CYCLES_800_T1H;
         period = CYCLES_800;
+#ifdef NEO_KHZ400
     }
     else
     { // 400 KHz bitstream
@@ -50,6 +49,7 @@ void espShow(
         time1 = CYCLES_400_T1H;
         period = CYCLES_400;
     }
+#endif
 
     for (t = time0;; t = time0)
     {
@@ -69,54 +69,54 @@ void espShow(
             pix = *p++;
             mask = 0x80;
         }
+        while ((_getCycleCount() - startTime) < period)
+            ; // Wait for last bit
     }
-    while ((_getCycleCount() - startTime) < period)
-        ; // Wait for last bit
-}
+    }
 
-void Adafruit_NeoPixel__show(Adafruit_NeoPixel *this)
-{
+    void Adafruit_NeoPixel__show(Adafruit_NeoPixel * this)
+    {
 
-    if (!this->pixels)
-        return;
+        if (!this->pixels)
+            return;
 
-    // Data latch = 50+ microsecond pause in the output stream.  Rather than
-    // put a delay at the end of the function, the ending time is noted and
-    // the function will simply hold off (if needed) on issuing the
-    // subsequent round of data until the latch time has elapsed.  This
-    // allows the mainline code to start generating the next frame of data
-    // rather than stalling for the latch.
-    while (!Adafruit_NeoPixel____inline__canShow(this))
-        ;
-    // endTime is a private member (rather than global var) so that mutliple
-    // instances on different pins can be quickly issued in succession (each
-    // instance doesn't delay the next).
+        // Data latch = 50+ microsecond pause in the output stream.  Rather than
+        // put a delay at the end of the function, the ending time is noted and
+        // the function will simply hold off (if needed) on issuing the
+        // subsequent round of data until the latch time has elapsed.  This
+        // allows the mainline code to start generating the next frame of data
+        // rather than stalling for the latch.
+        while (!Adafruit_NeoPixel____inline__canShow(this))
+            ;
+        // endTime is a private member (rather than global var) so that mutliple
+        // instances on different pins can be quickly issued in succession (each
+        // instance doesn't delay the next).
 
-    // In order to make this code runtime-configurable to work with any pin,
-    // SBI/CBI instructions are eschewed in favor of full PORT writes via the
-    // OUT or ST instructions.  It relies on two facts: that peripheral
-    // functions (such as PWM) take precedence on output pins, so our PORT-
-    // wide writes won't interfere, and that interrupts are globally disabled
-    // while data is being issued to the LEDs, so no other code will be
-    // accessing the PORT.  The code takes an initial 'snapshot' of the PORT
-    // state, computes 'pin high' and 'pin low' values, and writes these back
-    // to the PORT register as needed.
+        // In order to make this code runtime-configurable to work with any pin,
+        // SBI/CBI instructions are eschewed in favor of full PORT writes via the
+        // OUT or ST instructions.  It relies on two facts: that peripheral
+        // functions (such as PWM) take precedence on output pins, so our PORT-
+        // wide writes won't interfere, and that interrupts are globally disabled
+        // while data is being issued to the LEDs, so no other code will be
+        // accessing the PORT.  The code takes an initial 'snapshot' of the PORT
+        // state, computes 'pin high' and 'pin low' values, and writes these back
+        // to the PORT register as needed.
 
-    noInterrupts(); // Need 100% focus on instruction timing
+        noInterrupts(); // Need 100% focus on instruction timing
 
-    // ESP8266 ----------------------------------------------------------------
+        // ESP8266 ----------------------------------------------------------------
 
-    // ESP8266 show() is external to enforce ICACHE_RAM_ATTR execution
-    espShow(this->pin, this->pixels, this->numBytes, this->is800KHz);
+        // ESP8266 show() is external to enforce ICACHE_RAM_ATTR execution
+        espShow(this->pin, this->pixels, this->numBytes, this->is800KHz);
 
-    // END ARCHITECTURE SELECT ------------------------------------------------
+        // END ARCHITECTURE SELECT ------------------------------------------------
 
-    interrupts();
+        interrupts();
 
-    this->endTime = micros(); // Save EOD time for latch on next call
-}
+        this->endTime = micros(); // Save EOD time for latch on next call
+    }
 
-bool Adafruit_NeoPixel____inline__canShow(Adafruit_NeoPixel *this)
-{
-    return (micros() - this->endTime) >= 50L;
-}
+    bool Adafruit_NeoPixel____inline__canShow(Adafruit_NeoPixel * this)
+    {
+        return (micros() - this->endTime) >= 50L;
+    }

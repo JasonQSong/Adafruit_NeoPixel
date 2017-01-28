@@ -86,7 +86,7 @@ void Adafruit_NeoPixel__begin(Adafruit_NeoPixel *this)
   this->begun = true;
 }
 
-void Adafruit_NeoPixel__updateLength(Adafruit_NeoPixel *this, uint16_t n)
+void Adafruit_NeoPixel__updateLength_n(Adafruit_NeoPixel *this, uint16_t n)
 {
   if (this->pixels)
     free(this->pixels); // Free existing data (if any)
@@ -104,7 +104,7 @@ void Adafruit_NeoPixel__updateLength(Adafruit_NeoPixel *this, uint16_t n)
   }
 }
 
-void Adafruit_NeoPixel__updateType(Adafruit_NeoPixel *this, neoPixelType t)
+void Adafruit_NeoPixel__updateType_t(Adafruit_NeoPixel *this, neoPixelType t)
 {
   boolean oldThreeBytesPerPixel = (this->wOffset == this->rOffset); // false if RGBW
 
@@ -122,7 +122,7 @@ void Adafruit_NeoPixel__updateType(Adafruit_NeoPixel *this, neoPixelType t)
   {
     boolean newThreeBytesPerPixel = (this->wOffset == this->rOffset);
     if (newThreeBytesPerPixel != oldThreeBytesPerPixel)
-      Adafruit_NeoPixel__updateLength(this, this->numLEDs);
+      Adafruit_NeoPixel__updateLength_n(this, this->numLEDs);
   }
 }
 

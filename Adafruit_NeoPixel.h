@@ -45,7 +45,6 @@
 #include "fw/src/mgos_gpio.h"
 #endif
 
-
 #endif // if defined(__cplusplus)
 
 // The order of primary colors in the NeoPixel data stream can vary

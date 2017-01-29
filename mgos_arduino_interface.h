@@ -6,6 +6,9 @@
 #define OUTPUT MGOS_GPIO_MODE_OUTPUT
 
 #define LOW 0
+#define HIGH 1
 #define digitalWrite mgos_gpio_write
+
+#define micros system_get_time
 
 #endif

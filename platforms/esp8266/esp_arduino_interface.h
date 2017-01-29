@@ -8,8 +8,8 @@
 
 #define _BV(b) (1UL << (b))
 
-#define micros NOW
 
-#define F_CPU (SYS_CPU_80MHZ * 10000000L)
+#define F_CPU 80000000L
+
 
 #endif

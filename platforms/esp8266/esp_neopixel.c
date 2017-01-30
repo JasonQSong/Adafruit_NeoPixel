@@ -82,6 +82,9 @@ void Adafruit_NeoPixel__show(Adafruit_NeoPixel *this)
   if (!this->pixels)
     return;
 
+  if (this->showing)
+    return;
+
   // Data latch = 50+ microsecond pause in the output stream.  Rather than
   // put a delay at the end of the function, the ending time is noted and
   // the function will simply hold off (if needed) on issuing the
@@ -109,7 +112,9 @@ void Adafruit_NeoPixel__show(Adafruit_NeoPixel *this)
   // ESP8266 ----------------------------------------------------------------
 
   // ESP8266 show() is external to enforce ICACHE_RAM_ATTR execution
+  this->showing = true;
   espShow(this->pin, this->pixels, this->numBytes, this->is800KHz);
+  this->showing = false;
 
   // END ARCHITECTURE SELECT ------------------------------------------------
 
@@ -118,7 +123,7 @@ void Adafruit_NeoPixel__show(Adafruit_NeoPixel *this)
   this->endTime = micros(); // Save EOD time for latch on next call
 }
 
-bool Adafruit_NeoPixel____inline__canShow(Adafruit_NeoPixel *this)
+inline bool Adafruit_NeoPixel____inline__canShow(Adafruit_NeoPixel *this)
 {
   return (micros() - this->endTime) >= 50L;
 }

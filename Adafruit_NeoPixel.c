@@ -34,8 +34,9 @@
 #include "Adafruit_NeoPixel.h"
 
 // Constructor when length, pin and type are known at compile-time:
-void Adafruit_NeoPixel____init___n_p_t(Adafruit_NeoPixel *this, uint16_t n, uint8_t p, neoPixelType t)
+Adafruit_NeoPixel *Adafruit_NeoPixel____init___n_p_t(uint16_t n, uint8_t p, neoPixelType t)
 {
+  Adafruit_NeoPixel *this = calloc(1, sizeof(Adafruit_NeoPixel));
   this->begun = false;
   this->brightness = 0;
   this->pixels = NULL;
@@ -43,6 +44,8 @@ void Adafruit_NeoPixel____init___n_p_t(Adafruit_NeoPixel *this, uint16_t n, uint
   Adafruit_NeoPixel__updateType_t(this, t);
   Adafruit_NeoPixel__updateLength_n(this, n);
   Adafruit_NeoPixel__setPin_p(this, p);
+  this->showing = false;
+  return this;
 }
 
 // via Michael Vogt/neophob: empty constructor is used when strand length
@@ -50,8 +53,9 @@ void Adafruit_NeoPixel____init___n_p_t(Adafruit_NeoPixel *this, uint16_t n, uint
 // read from internal flash memory or an SD card, or arrive via serial
 // command.  If using this constructor, MUST follow up with updateType(),
 // updateLength(), etc. to establish the strand type, length and pin number!
-void Adafruit_NeoPixel____init__(Adafruit_NeoPixel *this)
+Adafruit_NeoPixel *Adafruit_NeoPixel____init__()
 {
+  Adafruit_NeoPixel *this = calloc(1, sizeof(Adafruit_NeoPixel));
 #ifdef NEO_KHZ400
   this->is800KHz = true;
 #endif
@@ -66,6 +70,8 @@ void Adafruit_NeoPixel____init__(Adafruit_NeoPixel *this)
   this->bOffset = 2;
   this->wOffset = 1;
   this->endTime = 0;
+  this->showing = false;
+  return this;
 }
 
 void Adafruit_NeoPixel____del__(Adafruit_NeoPixel *this)
@@ -160,13 +166,13 @@ void Adafruit_NeoPixel__setPixelColor_n_r_g_b(Adafruit_NeoPixel *this,
     }
     uint8_t *p;
     if (this->wOffset == this->rOffset)
-    {                           // Is an RGB-type strip
+    {                             // Is an RGB-type strip
       p = &(this->pixels[n * 3]); // 3 bytes per pixel
     }
     else
-    {                           // Is a WRGB-type strip
+    {                             // Is a WRGB-type strip
       p = &(this->pixels[n * 4]); // 4 bytes per pixel
-      p[this->wOffset] = 0;     // But only R,G,B passed -- set W to 0
+      p[this->wOffset] = 0;       // But only R,G,B passed -- set W to 0
     }
     p[this->rOffset] = r; // R,G,B always stored
     p[this->gOffset] = g;
@@ -189,13 +195,13 @@ void Adafruit_NeoPixel__setPixelColor_n_r_g_b_w(Adafruit_NeoPixel *this,
     }
     uint8_t *p;
     if (this->wOffset == this->rOffset)
-    {                           // Is an RGB-type strip
+    {                             // Is an RGB-type strip
       p = &(this->pixels[n * 3]); // 3 bytes per pixel (ignore W)
     }
     else
-    {                           // Is a WRGB-type strip
+    {                             // Is a WRGB-type strip
       p = &(this->pixels[n * 4]); // 4 bytes per pixel
-      p[this->wOffset] = w;     // Store W
+      p[this->wOffset] = w;       // Store W
     }
     p[this->rOffset] = r; // Store R,G,B
     p[this->gOffset] = g;

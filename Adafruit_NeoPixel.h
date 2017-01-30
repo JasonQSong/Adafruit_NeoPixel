@@ -200,7 +200,8 @@ typedef struct
 #ifdef NEO_KHZ400 // If 400 KHz NeoPixel support enabled...
         is800KHz, // ...true if 800 KHz pixels
 #endif
-        begun;    // true if begin() previously called
+        begun,    // true if begin() previously called
+        showing;
     uint16_t
         numLEDs,  // Number of RGB LEDs in strip
         numBytes; // Size of 'pixels' buffer below (3 or 4 bytes/pixel)
@@ -224,9 +225,9 @@ typedef struct
 
 } Adafruit_NeoPixel;
 // Constructor: number of LEDs, pin number, LED type
-void Adafruit_NeoPixel____init___n_p_t(Adafruit_NeoPixel *this, uint16_t n, uint8_t p, neoPixelType t);
+Adafruit_NeoPixel *Adafruit_NeoPixel____init___n_p_t(uint16_t n, uint8_t p, neoPixelType t);
 // Adafruit_NeoPixel____init___n_p_t(Adafruit_NeoPixel *this, uint16_t n, uint8_t p=6, neoPixelType t=NEO_GRB + NEO_KHZ800);
-void Adafruit_NeoPixel____init__(Adafruit_NeoPixel *this);
+Adafruit_NeoPixel *Adafruit_NeoPixel____init__();
 void Adafruit_NeoPixel____del__(Adafruit_NeoPixel *this);
 void Adafruit_NeoPixel__begin(Adafruit_NeoPixel *this);
 void Adafruit_NeoPixel__show(Adafruit_NeoPixel *this);

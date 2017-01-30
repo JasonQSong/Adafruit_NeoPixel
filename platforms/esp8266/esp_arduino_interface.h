@@ -9,7 +9,7 @@
 #define _BV(b) (1UL << (b))
 
 
-#define F_CPU 80000000L
+#define F_CPU (system_get_cpu_freq()*1000000L)
 
 
 #endif

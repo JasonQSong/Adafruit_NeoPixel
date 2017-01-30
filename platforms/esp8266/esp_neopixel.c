@@ -15,7 +15,7 @@ static inline uint32_t _getCycleCount(void)
   return ccount;
 }
 
-char *espShow(
+void espShow(
     uint8_t pin, uint8_t *pixels, uint32_t numBytes, boolean is800KHz)
 {
 
@@ -74,10 +74,6 @@ char *espShow(
   }
   while ((_getCycleCount() - startTime) < period)
     ; // Wait for last bit
-
-  char *ret = calloc(100, sizeof(char));
-  sprintf(ret, "%04u %04u %04u %04u %04u %04u %04u \n", t, time0, time1, period, c, startTime, pinMask);
-  return ret;
 }
 
 void Adafruit_NeoPixel__show(Adafruit_NeoPixel *this)
@@ -113,22 +109,11 @@ void Adafruit_NeoPixel__show(Adafruit_NeoPixel *this)
   // ESP8266 ----------------------------------------------------------------
 
   // ESP8266 show() is external to enforce ICACHE_RAM_ATTR execution
-  uint32_t startcycle, endcycle;
-  __asm__ __volatile__("rsr %0,ccount"
-                       : "=a"(startcycle));
-  char *logs = espShow(this->pin, this->pixels, this->numBytes, this->is800KHz);
-  __asm__ __volatile__("rsr %0,ccount"
-                       : "=a"(endcycle));
+  espShow(this->pin, this->pixels, this->numBytes, this->is800KHz);
 
   // END ARCHITECTURE SELECT ------------------------------------------------
 
   interrupts();
-  CONSOLE_LOG(LL_INFO, ("begin"));
-  CONSOLE_LOG(LL_INFO, ("%d", F_CPU));
-  CONSOLE_LOG(LL_INFO, ("%d", endcycle - startcycle));
-  CONSOLE_LOG(LL_INFO, ("%d", this->endTime));
-  CONSOLE_LOG(LL_INFO, (logs));
-  free(logs);
 
   this->endTime = micros(); // Save EOD time for latch on next call
 }
